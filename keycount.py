@@ -4,7 +4,7 @@ import json
 import time 
 
 parser = argparse.ArgumentParser("keycount")
-parser.add_argument('--devices', type=str, default='3', help='target devices event numbers, devided by \'-\'')
+parser.add_argument('--devices', type=str, default='0-22', help='target devices event numbers, devided by \'-\'')
 parser.add_argument('--file', type=str, default='./file.json', help='data file')
 args = parser.parse_args()
 
@@ -50,7 +50,8 @@ async def save_event(device):
             print(event.code, key_dict[str(event.code)], sep=':')
 
 if __name__ == '__main__':
-    devices = ['/dev/input/event'+i for i in args.devices.rsplit('-')]
+    ranges = args.devices.rsplit('-') 
+    devices = ['/dev/input/event'+str(i) for i in range(int(ranges[0]), 1+int(ranges[1]))] 
     devices = [evdev.InputDevice(dev) for dev in devices]
     key_dict = load_keys(args)
     for dev in devices:
