@@ -1,23 +1,27 @@
 import argparse
-import asyncio, evdev
+import asyncio, evdev, os
 import json
-import time 
+import time
 
 parser = argparse.ArgumentParser("keycount")
-parser.add_argument('--devices', type=str, default='0-22', help='target devices event numbers, devided by \'-\'')
-parser.add_argument('--file', type=str, default='./file.json', help='data file')
+# parser.add_argument('--devices', type=str, default='0-22', help='target devices event numbers, devided by \'-\'')
+parser.add_argument('--file',
+                    type=str,
+                    default='./file.json',
+                    help='data file')
 args = parser.parse_args()
 
-KEYINPUT = 1 
-KEYUP = 0 
+KEYINPUT = 1
+KEYUP = 0
 KEYDOWN = 1
+
 
 def load_keys(args):
     try:
         key_dir = open(args.file, 'r')
     except:
         key_dir = open(args.file, 'w')
-        dic = {} 
+        dic = {}
         for i in range(240):
             dic[str(i)] = 0
         key_dir.write(json.dumps(dic))
@@ -35,11 +39,13 @@ def save_keys(key_dict, args):
     key_dir.write(key_json)
     key_dir.close()
 
+
 def check_time(start, end, args):
     if end - start > args.time:
         return True
     else:
         return False
+
 
 async def save_event(device):
     async for event in device.async_read_loop():
@@ -49,9 +55,12 @@ async def save_event(device):
             save_keys(key_dict, args)
             print(event.code, key_dict[str(event.code)], sep=':')
 
+
 if __name__ == '__main__':
-    ranges = args.devices.rsplit('-') 
-    devices = ['/dev/input/event'+str(i) for i in range(int(ranges[0]), 1+int(ranges[1]))] 
+    devices = [
+        '/dev/input/' + i for i in os.listdir('/dev/input')
+        if i.find('event') != -1
+    ]
     devices = [evdev.InputDevice(dev) for dev in devices]
     key_dict = load_keys(args)
     for dev in devices:
