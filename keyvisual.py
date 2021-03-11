@@ -5,14 +5,6 @@ import argparse
 from keyconst import *
 from keycount import load_keys
 
-
-def norm_keys(key_dict):
-    key_sum = sum(key_dict[i] for i in key_dict.keys())
-    for i in key_dict.keys():
-        key_dict[i] = key_dict[i] * 1.0 / key_sum
-    return key_dict
-
-
 parser = argparse.ArgumentParser("keyvisual")
 parser.add_argument('--file',
                     type=str,
@@ -31,6 +23,14 @@ parser.add_argument('--dpi',
                     default=960,
                     help='dpi to save the file')
 args = parser.parse_args()
+
+
+def norm_keys(key_dict):
+    key_sum = sum(key_dict[i] for i in key_dict.keys())
+    for i in key_dict.keys():
+        key_dict[i] = key_dict[i] * 1.0 / key_sum
+    return key_dict
+
 
 key_dict = load_keys(args)
 key_dict = norm_keys(key_dict)
